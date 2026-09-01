@@ -115,7 +115,7 @@ android/app/src/main/jniLibs/
 # mithkaX-cache, so match them WITHOUT a trailing slash (directory-only patterns
 # like /build/ do not match a symlink).
 /build
-/dart_tool
+.dart_tool
 .gradle_home
 .gradle_home.deleting
 .gradle
