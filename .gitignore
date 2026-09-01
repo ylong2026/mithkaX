@@ -109,3 +109,14 @@ android/app/src/main/jniLibs/
 /third_party/fvp/android/.cxx/
 /third_party/fvp/android/mdk-sdk/
 /third_party/fvp/android/mdk-sdk-*.7z
+
+# Local build caches relocated out of iCloud Documents via symlinks (disk-space
+# slim build). These names may be symlinks pointing to ~/Library/Caches/
+# mithkaX-cache, so match them WITHOUT a trailing slash (directory-only patterns
+# like /build/ do not match a symlink).
+/build
+/dart_tool
+.gradle_home
+.gradle_home.deleting
+.gradle
+tdjson-*.zip
