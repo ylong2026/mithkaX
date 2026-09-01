@@ -17,6 +17,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mithka/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ad_filter/ad_filter_service.dart';
 import '../app/chat_deep_link_controller.dart';
 import '../settings/country_chat_blocker.dart';
 import '../settings/keyword_blocker.dart';
@@ -373,6 +374,12 @@ class NotificationController with WidgetsBindingObserver, ChangeNotifier {
 
     final messageText = _notificationText(content);
     if (KeywordBlocker.shared.matches(messageText)) return;
+    if (AdFilterService.shared.shouldBlock(
+      text: messageText,
+      senderId: _senderUserId(raw),
+    )) {
+      return;
+    }
     final surface = notificationSurfaceFor(
       lifecycleState: _state,
       inAppBannersEnabled: _inAppBannersEnabled,
@@ -1064,6 +1071,15 @@ class NotificationController with WidgetsBindingObserver, ChangeNotifier {
     return text.isEmpty
         ? AppStrings.t(AppStringKeys.chatSearchMessageResultLabel)
         : text;
+  }
+
+  /// The user id behind a TDLib `MessageSender`, or null when the sender is a
+  /// channel or an anonymous admin, which have no user id to match a
+  /// `sender:` rule against.
+  int? _senderUserId(Map<String, dynamic> message) {
+    final sender = message.obj('sender_id');
+    if (sender?.type != 'messageSenderUser') return null;
+    return sender?.int64('user_id');
   }
 
   Future<String?> _senderLabel(

@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mithka/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ad_filter/ad_filter_service.dart';
 import '../app/performance_metrics.dart';
 import '../communities/community_models.dart';
 import '../notifications/notification_settings_payload.dart';
@@ -1414,7 +1415,10 @@ class ChatListViewModel extends ChangeNotifier {
   }
 
   String _previewText(String text) {
-    return KeywordBlocker.shared.matches(text)
+    // The chat list only has the collapsed preview text, so sender-id rules
+    // cannot apply here — they still take effect once the chat is opened.
+    return KeywordBlocker.shared.matches(text) ||
+            AdFilterService.shared.shouldBlock(text: text)
         ? AppStringKeys.chatListBlockedPlaceholder
         : text;
   }

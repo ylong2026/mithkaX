@@ -66,6 +66,7 @@ import 'platform/system_ui.dart';
 import 'pro/mithka_pro_service.dart';
 import 'security/local_app_lock_controller.dart';
 import 'security/local_app_lock_views.dart';
+import 'ad_filter/ad_filter_service.dart';
 import 'settings/ai_settings_controller.dart';
 import 'settings/app_icon_controller.dart';
 import 'settings/auto_download_media_controller.dart';
@@ -241,6 +242,8 @@ Future<void> _bootstrapAndRunApp() async {
   ]);
   DesktopHotkeyController.initializeShared(prefs, replace: true);
   KeywordBlocker.shared.initialize(prefs);
+  // Also starts the periodic rule refresh when a list URL is configured.
+  AdFilterService.shared.initialize(prefs);
   CountryMessageFilter.shared.initialize(prefs);
   unawaited(SensitiveContentController.shared.initialize());
   MusicPlayerController.shared.initialize(prefs);
@@ -619,6 +622,7 @@ class _MithkaAppState extends State<MithkaApp> with WidgetsBindingObserver {
 
         _autoDownload.initialize(widget.prefs);
         KeywordBlocker.shared.initialize(widget.prefs);
+        AdFilterService.shared.initialize(widget.prefs);
         CountryMessageFilter.shared.initialize(widget.prefs);
         MusicPlayerController.shared.initialize(widget.prefs);
         BlockedUserService.shared.enabled = nextTheme.hideBlockedUserMessages;

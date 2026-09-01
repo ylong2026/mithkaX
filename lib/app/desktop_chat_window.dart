@@ -11,6 +11,7 @@ import '../chat/chat_info_view.dart';
 import '../chat/chat_members_view.dart';
 import '../chat/chat_view.dart';
 import '../chat/desktop_chat_context_pane.dart';
+import '../ad_filter/ad_filter_service.dart';
 import '../chat/group_remark_controller.dart';
 import '../chat/music_player_controller.dart';
 import '../chats/chat_folder_tag_controller.dart';
@@ -151,6 +152,7 @@ class _DesktopChatWindowAppState extends State<DesktopChatWindowApp> {
       _reloadPresentationPreferences,
     );
     KeywordBlocker.shared.initialize(widget.prefs);
+    AdFilterService.shared.initialize(widget.prefs);
     CountryMessageFilter.shared.initialize(widget.prefs);
     MusicPlayerController.shared.initialize(widget.prefs);
     unawaited(_ai.initialize());

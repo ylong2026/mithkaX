@@ -1,12 +1,14 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
+import '../ad_filter/ad_filter_service.dart';
 import '../components/app_icons.dart';
 import '../components/ui_components.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_motion.dart';
 import '../theme/app_theme.dart';
 import '../theme/theme_controller.dart';
+import 'ad_filter_view.dart';
 import 'blocked_user_service.dart';
 import 'country_message_filter.dart';
 import 'country_message_filter_view.dart';
@@ -23,7 +25,12 @@ class BlockingSettingsView extends StatelessWidget {
       title: AppStringKeys.settingsContentFilters.l10n(context),
       onBack: () => Navigator.of(context).pop(),
       child: ListenableBuilder(
-        listenable: country,
+        // The ad filter refreshes on its own timer, so the rule count shown
+        // here has to track it as well as the country filter.
+        listenable: Listenable.merge(<Listenable>[
+          country,
+          AdFilterService.shared,
+        ]),
         builder: (context, _) => SettingsListView(
           children: [
             _card(context, [
@@ -45,6 +52,18 @@ class BlockingSettingsView extends StatelessWidget {
                 onTap: () => Navigator.of(context).push(
                   AppPageRoute<void>(
                     pageBuilder: (_, _, _) => const KeywordBlockerView(),
+                  ),
+                ),
+              ),
+              SettingsRow(
+                title: AppStringKeys.adFilterTitle,
+                value: AppStrings.t(AppStringKeys.adFilterRuleCount, {
+                  'value1': AdFilterService.shared.ruleCount,
+                }),
+                leading: const SettingsLeadingIcon(icon: HeroAppIcons.filter),
+                onTap: () => Navigator.of(context).push(
+                  AppPageRoute<void>(
+                    pageBuilder: (_, _, _) => const AdFilterView(),
                   ),
                 ),
               ),

@@ -15,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mithka/l10n/app_localizations.dart';
 import 'package:mithka/notifications/scope_notification_settings.dart';
 
+import '../ad_filter/ad_filter_service.dart';
 import '../notifications/notification_settings_payload.dart';
 import '../settings/blocked_user_service.dart';
 import '../settings/keyword_blocker.dart';
@@ -769,8 +770,13 @@ class ChatViewModel extends ChangeNotifier {
   void onAppear() {
     _client.send({'@type': 'openChat', 'chat_id': chatId});
     _subscribeToUpdates();
+    // The ad filter refreshes from the network on its own timer, so the
+    // transcript has to be re-filtered when new rules land, not just when the
+    // user edits the keyword list.
     KeywordBlocker.shared.removeListener(_applyKeywordFilter);
     KeywordBlocker.shared.addListener(_applyKeywordFilter);
+    AdFilterService.shared.removeListener(_applyKeywordFilter);
+    AdFilterService.shared.addListener(_applyKeywordFilter);
     () async {
       unawaited(_loadMe());
       unawaited(_loadAiCapabilities());
@@ -1017,6 +1023,7 @@ class ChatViewModel extends ChangeNotifier {
     _sub?.cancel();
     _sub = null;
     KeywordBlocker.shared.removeListener(_applyKeywordFilter);
+    AdFilterService.shared.removeListener(_applyKeywordFilter);
     _client.send({'@type': 'closeChat', 'chat_id': chatId});
   }
 
@@ -1024,6 +1031,7 @@ class ChatViewModel extends ChangeNotifier {
   void dispose() {
     _isDisposed = true;
     KeywordBlocker.shared.removeListener(_applyKeywordFilter);
+    AdFilterService.shared.removeListener(_applyKeywordFilter);
     _sub?.cancel();
     _typingTimer?.cancel();
     _draftSaveTimer?.cancel();
@@ -5610,7 +5618,15 @@ class ChatViewModel extends ChangeNotifier {
     final senderId = message.senderId;
     if (senderId != null && _blockedSenderIds.contains(senderId)) return true;
     if (KeywordBlocker.shared.isSenderBlocked(senderId)) return true;
-    return KeywordBlocker.shared.matches(message.text);
+    if (KeywordBlocker.shared.matches(message.text)) return true;
+    // Ad rules run last: they are the broadest set and the most likely to be
+    // refreshed while the chat is open, so keeping them at the end means a
+    // narrow keyword verdict short-circuits before the rule engine scans the
+    // text for links.
+    return AdFilterService.shared.shouldBlock(
+      text: message.text,
+      senderId: senderId,
+    );
   }
 
   /// Rebuilds `messages` from `_allMessages` and refreshes the lookup indexes.
