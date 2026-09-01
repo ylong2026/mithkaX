@@ -137,6 +137,10 @@
     <string name="adFilterRulesUpToDate">規則已是最新</string>
     <string name="adFilterRulesUrl">規則庫 URL</string>
     <string name="adFilterTitle">廣告過濾</string>
+    <string name="adFilterCategorySection">依類別過濾</string>
+    <string name="adFilterCategoryHint">關閉某類別後，該類別的廣告將不再被封鎖</string>
+    <string name="adFilterCategoryEmpty">載入規則後，這裡會依類別列出可開關的選項</string>
+    <string name="adFilterCategoryOther">未分類</string>
     <string name="addMembersDone">完成</string>
     <string name="addMembersDoneWithCount">完成（{value1}）</string>
     <string name="addMembersInviteMembersTitle">邀請成員</string>

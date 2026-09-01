@@ -37,6 +37,7 @@ class AdFilterService extends ChangeNotifier {
   static const _keyInterval = 'adFilterRefreshMinutes';
   static const _keyLastSync = 'adFilterLastSyncAt';
   static const _keyLastError = 'adFilterLastError';
+  static const _keyDisabledCategories = 'adFilterDisabledCategories';
 
   SharedPreferences? _prefs;
   Timer? _refreshTimer;
@@ -51,6 +52,11 @@ class AdFilterService extends ChangeNotifier {
   DateTime? _lastSyncAt;
   String? _lastError;
   bool _refreshing = false;
+
+  /// Categories the user has switched off. Stored as a set of category ids;
+  /// empty means "everything on", which keeps the behaviour identical to the
+  /// pre-category version and makes new categories default to enabled.
+  final Set<String> _disabledCategories = <String>{};
 
   // ---- Read surface -------------------------------------------------------
 
@@ -81,6 +87,40 @@ class AdFilterService extends ChangeNotifier {
   /// True once there is something to match against.
   bool get isActive => _enabled && !_engine.isEmpty;
 
+  /// Categories present in the currently loaded rule set (block rules only),
+  /// mapped to how many rules each holds. Drives the per-category toggle UI.
+  /// A `null` category is reported under the synthetic id `uncategorized`.
+  Map<String, int> get categoryBreakdown {
+    final counts = <String, int>{};
+    for (final rule in _rules) {
+      if (rule.allow) continue;
+      final category = rule.category ?? 'uncategorized';
+      counts[category] = (counts[category] ?? 0) + 1;
+    }
+    return counts;
+  }
+
+  /// Whether [category] is currently allowed to block. The synthetic id
+  /// `uncategorized` is on by default, like every other category.
+  bool isCategoryEnabled(String category) =>
+      !_disabledCategories.contains(category);
+
+  /// Turns [category] on (`enabled == true`) or off. Off means its block rules
+  /// are dropped from the compiled engine, so those ads stop being hidden;
+  /// allow-list rules are unaffected. Persisted immediately.
+  void setCategoryEnabled(String category, bool enabled) {
+    final currentlyEnabled = !_disabledCategories.contains(category);
+    if (currentlyEnabled == enabled) return;
+    if (enabled) {
+      _disabledCategories.remove(category);
+    } else {
+      _disabledCategories.add(category);
+    }
+    _prefs?.setStringList(_keyDisabledCategories, _disabledCategories.toList());
+    _rebuild();
+    notifyListeners();
+  }
+
   /// The compiled engine, exposed for the appearance preview, which renders
   /// sample transcripts without going through a chat view model.
   AdRuleEngine get engine => _engine;
@@ -94,6 +134,9 @@ class AdFilterService extends ChangeNotifier {
     _enabled = prefs.getBool(_keyEnabled) ?? true;
     _autoRefresh = prefs.getBool(_keyAutoRefresh) ?? true;
     _intervalMinutes = _sanitizeInterval(prefs.getInt(_keyInterval));
+    _disabledCategories
+      ..clear()
+      ..addAll(prefs.getStringList(_keyDisabledCategories) ?? const <String>[]);
     final syncMs = prefs.getInt(_keyLastSync);
     _lastSyncAt =
         syncMs == null ? null : DateTime.fromMillisecondsSinceEpoch(syncMs);
@@ -279,7 +322,13 @@ class AdFilterService extends ChangeNotifier {
     final blocks = <AdRule>[];
     final allows = <AdRule>[];
     for (final rule in _rules) {
-      (rule.allow ? allows : blocks).add(rule);
+      if (rule.allow) {
+        allows.add(rule);
+      } else if (!_disabledCategories.contains(rule.category)) {
+        // A disabled category's block rules are simply left out of the engine,
+        // so they can never match. Allow rules are always kept.
+        blocks.add(rule);
+      }
     }
     _engine = AdRuleEngine.withRules(blocks);
     _allowEngine = AdRuleEngine.withRules(allows);

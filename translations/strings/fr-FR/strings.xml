@@ -137,6 +137,10 @@
     <string name="adFilterRulesUpToDate">Les règles sont à jour</string>
     <string name="adFilterRulesUrl">URL de la liste de règles</string>
     <string name="adFilterTitle">Filtre publicitaire</string>
+    <string name="adFilterCategorySection">Filtrer par catégorie</string>
+    <string name="adFilterCategoryHint">Désactiver une catégorie cesse de bloquer ce type d'annonce</string>
+    <string name="adFilterCategoryEmpty">Une fois les règles chargées, les catégories basculables apparaissent ici</string>
+    <string name="adFilterCategoryOther">Non classé</string>
     <string name="addMembersDone">Terminé</string>
     <string name="addMembersDoneWithCount">Terminé ({value1})</string>
     <string name="addMembersInviteMembersTitle">Inviter des membres</string>

@@ -47,6 +47,7 @@ class AdRule {
     this.caseSensitive = false,
     this.allow = false,
     this.source,
+    this.category,
   });
 
   final AdRuleKind kind;
@@ -66,6 +67,13 @@ class AdRule {
   /// this null. It is metadata only and never takes part in matching.
   final String? source;
 
+  /// Optional ad category id (e.g. `airport`, `gambling`). Carried by the
+  /// remote rules.json so the settings UI can offer a per-category on/off
+  /// switch. It is metadata only — two rules that are otherwise identical but
+  /// tagged with different categories still dedupe to one, because matching
+  /// behaviour is identical regardless of the label.
+  final String? category;
+
   /// Identity used for de-duplication across refreshes.
   String get dedupeKey => '${allow ? 'a' : 'b'}:${kind.wireName}:${caseSensitive ? 's' : 'i'}:'
       '${kind == AdRuleKind.sender ? _normalizedSender() : (caseSensitive ? pattern : pattern.toLowerCase())}';
@@ -83,6 +91,7 @@ class AdRule {
         if (caseSensitive) 'caseSensitive': true,
         if (allow) 'allow': true,
         if (source != null) 'source': source,
+        if (category != null) 'category': category,
       };
 
   /// Returns null instead of throwing when [raw] is malformed, so one bad
@@ -103,6 +112,7 @@ class AdRule {
       caseSensitive: raw['caseSensitive'] == true,
       allow: raw['allow'] == true,
       source: raw['source'] is String ? raw['source'] as String : null,
+      category: raw['category'] is String ? raw['category'] as String : null,
     );
   }
 
@@ -112,6 +122,7 @@ class AdRule {
     bool? caseSensitive,
     bool? allow,
     String? source,
+    String? category,
   }) =>
       AdRule(
         kind: kind ?? this.kind,
@@ -119,6 +130,7 @@ class AdRule {
         caseSensitive: caseSensitive ?? this.caseSensitive,
         allow: allow ?? this.allow,
         source: source ?? this.source,
+        category: category ?? this.category,
       );
 
   @override

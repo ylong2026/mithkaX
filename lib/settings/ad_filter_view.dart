@@ -19,6 +19,44 @@ import '../theme/app_theme.dart';
 /// Preset intervals offered in the picker, in minutes.
 const List<int> kAdFilterIntervalChoices = <int>[15, 30, 60, 180, 720];
 
+/// 已知类目 id → 中文标签。必须与 rules 仓 `categories.json` 的 id 对齐。
+/// 未知类目（如外部源未打标的规则）直接显示其原始 id，避免误导。
+const Map<String, String> kAdFilterCategoryLabels = <String, String>{
+  'airport': '机场 / VPN / 代理 / 翻墙',
+  'gambling': '赌博 / 博彩 / 棋牌',
+  'adult': '黄色 / 卖片 / 约炮',
+  'phishing_scam': '诈骗 / 杀猪盘 / 刷单',
+  'selling': '卖货 / 微商 / 招代理',
+  'finance_illegal': '非法贷款 / 套现',
+  'proxy_service': '代办 / 代充 / 解封',
+  'spam_link': '推广链接 / 拉群',
+};
+
+/// 类目在开关列表里的展示顺序：已知类目优先，未分类置底。
+const List<String> kAdFilterCategoryOrder = <String>[
+  'airport',
+  'gambling',
+  'adult',
+  'phishing_scam',
+  'selling',
+  'finance_illegal',
+  'proxy_service',
+  'spam_link',
+];
+
+/// 类目开关的展示顺序：按已知顺序排，未知类目按字母补在中段，未分类永远置底。
+List<String> orderedCategories(Map<String, int> breakdown) {
+  final known =
+      kAdFilterCategoryOrder.where((id) => breakdown.containsKey(id)).toList();
+  final unknown = breakdown.keys
+      .where((id) => id != 'uncategorized' && !kAdFilterCategoryOrder.contains(id))
+      .toList()
+    ..sort();
+  final ordered = <String>[...known, ...unknown];
+  if (breakdown.containsKey('uncategorized')) ordered.add('uncategorized');
+  return ordered;
+}
+
 class AdFilterView extends StatefulWidget {
   const AdFilterView({super.key});
 
@@ -116,10 +154,46 @@ class _AdFilterViewState extends State<AdFilterView> {
             ],
           ),
           const SizedBox(height: AppSpacing.lg),
+          _categorySection(),
+          const SizedBox(height: AppSpacing.lg),
           SettingsNote(text: AppStringKeys.adFilterDescription),
         ],
       ),
     );
+  }
+
+  /// 按类别过滤：列出已加载规则里出现的类目，每个一个开关。
+  /// 关闭某类目后，该类的屏蔽规则从引擎移除，这类广告不再被隐藏。
+  Widget _categorySection() {
+    final breakdown = _service.categoryBreakdown;
+    final ordered = orderedCategories(breakdown);
+    return SettingsSection(
+      titleKey: AppStringKeys.adFilterCategorySection,
+      rows: [
+        if (ordered.isEmpty)
+          SettingsNote(text: AppStringKeys.adFilterCategoryEmpty)
+        else ...[
+          SettingsNote(text: AppStringKeys.adFilterCategoryHint),
+          for (final id in ordered)
+            SettingsSwitchRow(
+              title: _categoryLabel(id),
+              value: _service.isCategoryEnabled(id),
+              leading: const SettingsLeadingIcon(icon: HeroAppIcons.filter),
+              onChanged: (enabled) => _service.setCategoryEnabled(id, enabled),
+              subtitle: AppStrings.t(AppStringKeys.adFilterRuleCount, {
+                'value1': breakdown[id] ?? 0,
+              }),
+            ),
+        ],
+      ],
+    );
+  }
+
+  String _categoryLabel(String id) {
+    if (id == 'uncategorized') {
+      return AppStrings.t(AppStringKeys.adFilterCategoryOther);
+    }
+    return kAdFilterCategoryLabels[id] ?? id;
   }
 
   String _statusText() {

@@ -137,6 +137,10 @@
     <string name="adFilterRulesUpToDate">Regeln sind aktuell</string>
     <string name="adFilterRulesUrl">URL der Regelliste</string>
     <string name="adFilterTitle">Werbefilter</string>
+    <string name="adFilterCategorySection">Nach Kategorie filtern</string>
+    <string name="adFilterCategoryHint">Das Ausschalten einer Kategorie blockiert diese Anzeigenart nicht mehr</string>
+    <string name="adFilterCategoryEmpty">Nach dem Laden der Regeln erscheinen hier umschaltbare Kategorien</string>
+    <string name="adFilterCategoryOther">Ohne Kategorie</string>
     <string name="addMembersDone">Fertig</string>
     <string name="addMembersDoneWithCount">Fertig ({value1})</string>
     <string name="addMembersInviteMembersTitle">Mitglieder einladen</string>

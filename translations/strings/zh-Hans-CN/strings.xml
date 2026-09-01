@@ -137,6 +137,10 @@
     <string name="adFilterRulesUpToDate">规则已是最新</string>
     <string name="adFilterRulesUrl">规则库 URL</string>
     <string name="adFilterTitle">广告过滤</string>
+    <string name="adFilterCategorySection">按类别过滤</string>
+    <string name="adFilterCategoryHint">关闭某类别后，该类别的广告将不再被屏蔽</string>
+    <string name="adFilterCategoryEmpty">加载规则后，这里会按类别列出可开关的选项</string>
+    <string name="adFilterCategoryOther">未分类</string>
     <string name="addMembersDone">完成</string>
     <string name="addMembersDoneWithCount">完成({value1})</string>
     <string name="addMembersInviteMembersTitle">邀请成员</string>

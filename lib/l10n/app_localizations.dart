@@ -1663,6 +1663,10 @@ abstract final class AppStringKeys {
   static const adFilterRulesUpToDate = 'adFilterRulesUpToDate';
   static const adFilterRulesUrl = 'adFilterRulesUrl';
   static const adFilterTitle = 'adFilterTitle';
+  static const adFilterCategorySection = 'adFilterCategorySection';
+  static const adFilterCategoryHint = 'adFilterCategoryHint';
+  static const adFilterCategoryEmpty = 'adFilterCategoryEmpty';
+  static const adFilterCategoryOther = 'adFilterCategoryOther';
   static const keywordBlockerAddFromMessageTitle =
       'keywordBlockerAddFromMessageTitle';
   static const keywordBlockerDescription = 'keywordBlockerDescription';

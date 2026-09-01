@@ -137,6 +137,10 @@
     <string name="adFilterRulesUpToDate">Rules are up to date</string>
     <string name="adFilterRulesUrl">Rule list URL</string>
     <string name="adFilterTitle">Ad Filter</string>
+    <string name="adFilterCategorySection">Filter by category</string>
+    <string name="adFilterCategoryHint">Turning a category off stops blocking that kind of ad</string>
+    <string name="adFilterCategoryEmpty">Once rules are loaded, categories you can toggle appear here</string>
+    <string name="adFilterCategoryOther">Uncategorized</string>
     <string name="addMembersDone">Done</string>
     <string name="addMembersDoneWithCount">Done ({value1})</string>
     <string name="addMembersInviteMembersTitle">Invite Members</string>

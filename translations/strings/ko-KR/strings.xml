@@ -137,6 +137,10 @@
     <string name="adFilterRulesUpToDate">규칙이 최신 상태입니다</string>
     <string name="adFilterRulesUrl">규칙 목록 URL</string>
     <string name="adFilterTitle">광고 필터</string>
+    <string name="adFilterCategorySection">카테고리별 필터</string>
+    <string name="adFilterCategoryHint">카테고리를 끄면 해당 종류의 광고를 차단하지 않습니다</string>
+    <string name="adFilterCategoryEmpty">규칙을 불러오면 여기에 토글 가능한 카테고리가 표시됩니다</string>
+    <string name="adFilterCategoryOther">미분류</string>
     <string name="addMembersDone">완료</string>
     <string name="addMembersDoneWithCount">완료({value1})</string>
     <string name="addMembersInviteMembersTitle">멤버 초대</string>

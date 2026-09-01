@@ -137,6 +137,10 @@
     <string name="adFilterRulesUpToDate">Las reglas están al día</string>
     <string name="adFilterRulesUrl">URL de la lista de reglas</string>
     <string name="adFilterTitle">Filtro de anuncios</string>
+    <string name="adFilterCategorySection">Filtrar por categoría</string>
+    <string name="adFilterCategoryHint">Desactivar una categoría deja de bloquear ese tipo de anuncio</string>
+    <string name="adFilterCategoryEmpty">Una vez cargadas las reglas, las categorías conmutables aparecen aquí</string>
+    <string name="adFilterCategoryOther">Sin categoría</string>
     <string name="addMembersDone">Listo</string>
     <string name="addMembersDoneWithCount">Listo ({value1})</string>
     <string name="addMembersInviteMembersTitle">Invitar miembros</string>
