@@ -25,6 +25,11 @@ import 'rule_model.dart';
 const int kAdFilterMinIntervalMinutes = 5;
 const int kAdFilterMaxIntervalMinutes = 1440;
 
+/// 生产环境默认规则源。App 首次启动即订阅此地址，无需手动填写；
+/// 可在「设置 → 广告过滤」里覆盖。这是公开只读的 raw URL，不是密钥。
+const String kAdFilterDefaultRulesUrl =
+    'https://raw.githubusercontent.com/ylong2026/mithkaX-rules/main/rules.json';
+
 class AdFilterService extends ChangeNotifier {
   AdFilterService._();
 
@@ -130,7 +135,7 @@ class AdFilterService extends ChangeNotifier {
   void initialize(SharedPreferences prefs) {
     _prefs = prefs;
     _rules = _decodeRules(prefs.getString(_keyRules));
-    _rulesUrl = prefs.getString(_keyUrl)?.trim() ?? '';
+    _rulesUrl = prefs.getString(_keyUrl)?.trim() ?? kAdFilterDefaultRulesUrl;
     _enabled = prefs.getBool(_keyEnabled) ?? true;
     _autoRefresh = prefs.getBool(_keyAutoRefresh) ?? true;
     _intervalMinutes = _sanitizeInterval(prefs.getInt(_keyInterval));
