@@ -45,6 +45,7 @@ class AdRule {
     required this.kind,
     required this.pattern,
     this.caseSensitive = false,
+    this.allow = false,
     this.source,
   });
 
@@ -55,12 +56,18 @@ class AdRule {
   /// sender ids are canonical by construction.
   final bool caseSensitive;
 
+  /// When true the rule is an exception: a message that matches it is never
+  /// blocked, even if another (blocking) rule also matches. This is the
+  /// allow-list that keeps an aggressive community list from false-positive
+  /// blocking legitimate content.
+  final bool allow;
+
   /// Where the rule came from, e.g. the remote list URL. Local rules leave
   /// this null. It is metadata only and never takes part in matching.
   final String? source;
 
   /// Identity used for de-duplication across refreshes.
-  String get dedupeKey => '${kind.wireName}:${caseSensitive ? 's' : 'i'}:'
+  String get dedupeKey => '${allow ? 'a' : 'b'}:${kind.wireName}:${caseSensitive ? 's' : 'i'}:'
       '${kind == AdRuleKind.sender ? _normalizedSender() : (caseSensitive ? pattern : pattern.toLowerCase())}';
 
   String _normalizedSender() {
@@ -74,6 +81,7 @@ class AdRule {
         'kind': kind.wireName,
         'pattern': pattern,
         if (caseSensitive) 'caseSensitive': true,
+        if (allow) 'allow': true,
         if (source != null) 'source': source,
       };
 
@@ -93,9 +101,25 @@ class AdRule {
       kind: kind,
       pattern: trimmed,
       caseSensitive: raw['caseSensitive'] == true,
+      allow: raw['allow'] == true,
       source: raw['source'] is String ? raw['source'] as String : null,
     );
   }
+
+  AdRule copyWith({
+    AdRuleKind? kind,
+    String? pattern,
+    bool? caseSensitive,
+    bool? allow,
+    String? source,
+  }) =>
+      AdRule(
+        kind: kind ?? this.kind,
+        pattern: pattern ?? this.pattern,
+        caseSensitive: caseSensitive ?? this.caseSensitive,
+        allow: allow ?? this.allow,
+        source: source ?? this.source,
+      );
 
   @override
   bool operator ==(Object other) =>

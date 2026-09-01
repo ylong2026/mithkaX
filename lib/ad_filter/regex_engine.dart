@@ -220,9 +220,30 @@ class AdRuleEngine {
     return host;
   }
 
+  /// Hard cap on a single rule pattern.
+  ///
+  /// Guards against pathological input from a remote list that could blow up
+  /// either compile time or, against a long message, backtracking time.
+  static const int kAdFilterMaxPatternLength = 256;
+
   static RegExp? _safeRegex(String pattern, {required bool caseSensitive}) {
+    var pat = pattern;
+    var cs = caseSensitive;
+    // Dart's RegExp has no inline flag syntax, so PCRE-style `(?i)` / `(?-i)`
+    // (used by filters such as Nagram) would throw and the rule would be
+    // dropped. Normalise them: `(?i)` flips to case-insensitive, `(?i:…)` and
+    // `(?-i:…)` become plain non-capturing groups.
+    if (pat.startsWith('(?i)')) {
+      pat = pat.substring(4);
+      cs = false;
+    } else if (pat.startsWith('(?-i)')) {
+      pat = pat.substring(5);
+      cs = true;
+    }
+    pat = pat.replaceAll('(?i:', '(?:').replaceAll('(?-i:', '(?:');
+    if (pat.isEmpty || pat.length > kAdFilterMaxPatternLength) return null;
     try {
-      return RegExp(pattern, caseSensitive: caseSensitive);
+      return RegExp(pat, caseSensitive: cs);
     } catch (_) {
       // Remote lists are user-supplied; an invalid pattern must not crash the
       // app or abort the whole refresh.

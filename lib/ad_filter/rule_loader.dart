@@ -149,8 +149,11 @@ class AdRuleLoader {
     }
 
     Object? payload = decoded;
-    if (payload is Map<String, dynamic>) {
-      payload = payload['rules'] ?? payload['ads'] ?? payload['items'];
+    List<Object?> allowEntries = const <Object?>[];
+    if (decoded is Map) {
+      payload = decoded['rules'] ?? decoded['ads'] ?? decoded['items'];
+      final allowList = decoded['allow'];
+      if (allowList is List) allowEntries = allowList;
     }
     if (payload is! List) {
       return _ParsedBatch(const <AdRule>[], 0, 1);
@@ -187,12 +190,37 @@ class AdRuleLoader {
             : rule,
       );
     }
+    for (final entry in allowEntries) {
+      AdRule? rule;
+      if (entry is String) {
+        final line = entry.trim();
+        if (line.isEmpty || line.startsWith('#') || line.startsWith('//')) {
+          ++skipped;
+          continue;
+        }
+        rule = _ruleFromLine(line, source: source)?.copyWith(allow: true);
+      } else {
+        rule = AdRule.fromJson(entry)?.copyWith(allow: true);
+      }
+      if (rule == null) {
+        ++invalid;
+      } else {
+        rules.add(rule);
+      }
+    }
     return _ParsedBatch(rules, skipped, invalid);
   }
 
   /// Turns one text line into a rule, or null when it is unusable.
   static AdRule? _ruleFromLine(String line, {String? source}) {
     final lower = line.toLowerCase();
+
+    if (lower.startsWith('allow:')) {
+      // An exception rule: a match is never blocked. Parsed as a normal rule
+      // then flagged as an allow-list entry.
+      final inner = _ruleFromLine(line.substring('allow:'.length), source: source);
+      return inner?.copyWith(allow: true);
+    }
 
     if (lower.startsWith('domain:')) {
       final host = line.substring('domain:'.length).trim();

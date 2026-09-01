@@ -43,6 +43,7 @@ class AdFilterService extends ChangeNotifier {
 
   List<AdRule> _rules = const <AdRule>[];
   AdRuleEngine _engine = AdRuleEngine.empty;
+  AdRuleEngine _allowEngine = AdRuleEngine.empty;
   String _rulesUrl = '';
   bool _enabled = true;
   bool _autoRefresh = true;
@@ -56,6 +57,12 @@ class AdFilterService extends ChangeNotifier {
   List<AdRule> get rules => List<AdRule>.unmodifiable(_rules);
 
   int get ruleCount => _rules.length;
+
+  /// Number of exception (allow-list) rules currently loaded.
+  int get allowCount => _rules.where((r) => r.allow).length;
+
+  /// Compiled allow-list engine, exposed for diagnostics/preview.
+  AdRuleEngine get allowEngine => _allowEngine;
 
   String get rulesUrl => _rulesUrl;
 
@@ -147,6 +154,10 @@ class AdFilterService extends ChangeNotifier {
   /// pays a single boolean check in the common case.
   bool shouldBlock({required String text, int? senderId}) {
     if (!_enabled || _engine.isEmpty) return false;
+    // Exceptions win: a message matching an allow rule is never hidden, even
+    // if a blocking rule also matches. This is what lets an aggressive
+    // community list stay precise instead of false-positive blocking.
+    if (_allowEngine.matches(text, senderId: senderId)) return false;
     return _engine.matches(text, senderId: senderId);
   }
 
@@ -265,7 +276,13 @@ class AdFilterService extends ChangeNotifier {
   }
 
   void _rebuild() {
-    _engine = AdRuleEngine.withRules(_rules);
+    final blocks = <AdRule>[];
+    final allows = <AdRule>[];
+    for (final rule in _rules) {
+      (rule.allow ? allows : blocks).add(rule);
+    }
+    _engine = AdRuleEngine.withRules(blocks);
+    _allowEngine = AdRuleEngine.withRules(allows);
   }
 
   static List<AdRule> _decodeRules(String? raw) {
