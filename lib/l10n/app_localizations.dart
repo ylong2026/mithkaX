@@ -1649,6 +1649,20 @@ abstract final class AppStringKeys {
   static const imagePreviewTitle = 'imagePreviewTitle';
   static const imageEditTextTool = 'imageEditTextTool';
   static const imageEditTitle = 'imageEditTitle';
+  static const adFilterAutoRefresh = 'adFilterAutoRefresh';
+  static const adFilterDescription = 'adFilterDescription';
+  static const adFilterEnabled = 'adFilterEnabled';
+  static const adFilterLastUpdated = 'adFilterLastUpdated';
+  static const adFilterMinutes = 'adFilterMinutes';
+  static const adFilterNeverUpdated = 'adFilterNeverUpdated';
+  static const adFilterRefreshFailed = 'adFilterRefreshFailed';
+  static const adFilterRefreshInterval = 'adFilterRefreshInterval';
+  static const adFilterRefreshNow = 'adFilterRefreshNow';
+  static const adFilterRuleCount = 'adFilterRuleCount';
+  static const adFilterRulesAdded = 'adFilterRulesAdded';
+  static const adFilterRulesUpToDate = 'adFilterRulesUpToDate';
+  static const adFilterRulesUrl = 'adFilterRulesUrl';
+  static const adFilterTitle = 'adFilterTitle';
   static const keywordBlockerAddFromMessageTitle =
       'keywordBlockerAddFromMessageTitle';
   static const keywordBlockerDescription = 'keywordBlockerDescription';
