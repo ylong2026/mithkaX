@@ -292,13 +292,18 @@ class AdFilterService extends ChangeNotifier {
       _lastSyncAt = DateTime.now();
       _lastError = null;
       _persistRules();
-      _prefs?.setInt(_keyLastSync, _lastSyncAt!.millisecondsSinceEpoch);
-      _prefs?.remove(_keyLastError);
+      final prefs = _prefs;
+      if (prefs != null) {
+        unawaited(prefs.setInt(_keyLastSync, _lastSyncAt!.millisecondsSinceEpoch));
+        unawaited(prefs.remove(_keyLastError));
+      }
       notifyListeners();
       return result.added;
     } catch (error) {
-      _lastError = error.toString();
-      _prefs?.setString(_keyLastError, _lastError);
+      final message = error.toString();
+      _lastError = message;
+      final prefs = _prefs;
+      if (prefs != null) unawaited(prefs.setString(_keyLastError, message));
       notifyListeners();
       rethrow;
     } finally {

@@ -25,6 +25,7 @@ import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ad_filter/ad_filter_service.dart';
 import 'app/app_navigator.dart';
 import 'app/app_performance_controller.dart';
 import 'app/app_version.dart';
@@ -66,7 +67,6 @@ import 'platform/system_ui.dart';
 import 'pro/mithka_pro_service.dart';
 import 'security/local_app_lock_controller.dart';
 import 'security/local_app_lock_views.dart';
-import 'ad_filter/ad_filter_service.dart';
 import 'settings/ai_settings_controller.dart';
 import 'settings/app_icon_controller.dart';
 import 'settings/auto_download_media_controller.dart';

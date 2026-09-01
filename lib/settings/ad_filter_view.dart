@@ -156,7 +156,7 @@ class _AdFilterViewState extends State<AdFilterView> {
           const SizedBox(height: AppSpacing.lg),
           _categorySection(),
           const SizedBox(height: AppSpacing.lg),
-          SettingsNote(text: AppStringKeys.adFilterDescription),
+          const SettingsNote(text: AppStringKeys.adFilterDescription),
         ],
       ),
     );
@@ -171,9 +171,9 @@ class _AdFilterViewState extends State<AdFilterView> {
       titleKey: AppStringKeys.adFilterCategorySection,
       rows: [
         if (ordered.isEmpty)
-          SettingsNote(text: AppStringKeys.adFilterCategoryEmpty)
+          const SettingsNote(text: AppStringKeys.adFilterCategoryEmpty)
         else ...[
-          SettingsNote(text: AppStringKeys.adFilterCategoryHint),
+          const SettingsNote(text: AppStringKeys.adFilterCategoryHint),
           for (final id in ordered)
             SettingsSwitchRow(
               title: _categoryLabel(id),

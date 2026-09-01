@@ -156,7 +156,7 @@ class AdRuleLoader {
       if (allowList is List) allowEntries = allowList;
     }
     if (payload is! List) {
-      return _ParsedBatch(const <AdRule>[], 0, 1);
+      return const _ParsedBatch(<AdRule>[], 0, 1);
     }
 
     for (final entry in payload) {
